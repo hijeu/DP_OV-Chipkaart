@@ -51,7 +51,6 @@ public class ReizigerDAOPsql implements ReizigerDAO {
             e.printStackTrace();
         }
 
-        System.out.println(recordsUpdated);
         return recordsUpdated > 0;
     }
 
@@ -88,11 +87,13 @@ public class ReizigerDAOPsql implements ReizigerDAO {
         try (PreparedStatement pst = this.conn.prepareStatement(q)) {
             pst.setInt(1, id);
             ResultSet rs = pst.executeQuery();
-            reiziger.setId(rs.getInt("reizigers_id"));
+            rs.next();
+            reiziger.setId(rs.getInt("reiziger_id"));
             reiziger.setVoorletters(rs.getString("voorletters"));
             reiziger.setTussenvoegsel(rs.getString("tussenvoegsel"));
             reiziger.setAchternaam(rs.getString("achternaam"));
             reiziger.setGeboortedatum(rs.getDate("geboortedatum"));
+            rs.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -118,6 +119,7 @@ public class ReizigerDAOPsql implements ReizigerDAO {
                 reiziger.setGeboortedatum(rs.getDate("geboortedatum"));
                 reizigers.add(reiziger);
             }
+            rs.close();
         } catch (Exception e) {
             e.printStackTrace();
         }

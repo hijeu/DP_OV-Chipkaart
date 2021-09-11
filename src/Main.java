@@ -47,9 +47,38 @@ public class Main {
         System.out.println(reizigers.size() + " reizigers\n");
 
         // Voeg aanvullende tests van de ontbrekende CRUD-operaties in.
-        // update
-        // delete
-        // findById
-        // findByGbdatum
+        // Maak een nieuwe reiziger aan en persisteer deze in de database. Vind deze bij zijn id.
+        gbdatum = "1999-03-13";
+        int reizigerId = 99;
+        Reiziger hieu = new Reiziger(reizigerId, "C.H.M", "", "Bui", java.sql.Date.valueOf(gbdatum));
+        rdao.save(hieu);
+        System.out.println(String.format("[Test] ReizigerDao.findById() geeft de volgende reiziger met ID '%d': ", reizigerId) + rdao.findById(reizigerId) + "\n");
+
+        // Verander de naam van de vorige aangemaakte reiziger en update de vorige aangemaakte reiziger in de database en vind deze bij zijn id.
+        hieu.setTussenvoegsel("van de");
+        hieu.setAchternaam("Buurt");
+        rdao.update(hieu);
+        System.out.println(String.format("[Test] ReizigerDao.findById() na ReizigerDao.update() geeft de volgende reiziger met ID '%d': ", reizigerId) + rdao.findById(reizigerId) + "\n");
+
+        // Vind alle reizigers met de volgende geboortedatum 2002-12-03
+        gbdatum = "2002-12-03";
+        reizigers = rdao.findByGbdatum(gbdatum);
+        System.out.printf("[Test] ReizigerDao.findByGbdatum() geeft de volgende reizigers met geboortedatum '%s':%n", gbdatum);
+        if (reizigers.size() > 0) {
+            for (Reiziger reiziger : reizigers) {
+                System.out.println(reiziger);
+            }
+        } else {
+            System.out.println("Geen reizigers gevonden met gezochte geboortedatum.");
+        }
+        System.out.println();
+
+        // Verwijder de aangemaakte reizigers uit de vorige tests uit de database
+        reizigers = rdao.findAll();
+        System.out.print("[Test] Eerst " + reizigers.size() + " reizigers, na ReizigerDAO.delete() ");
+        rdao.delete(sietske);
+        rdao.delete(hieu);
+        reizigers = rdao.findAll();
+        System.out.println(reizigers.size() + " reizigers\n");
     }
 }
