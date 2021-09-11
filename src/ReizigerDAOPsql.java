@@ -4,9 +4,14 @@ import java.util.List;
 
 public class ReizigerDAOPsql implements ReizigerDAO {
     private Connection conn;
+    private AdresDAO adao;
 
     public ReizigerDAOPsql(Connection conn) {
         this.conn = conn;
+    }
+
+    public void setAdao (AdresDAO adao) {
+        this.adao = adao;
     }
 
     @Override
@@ -15,7 +20,7 @@ public class ReizigerDAOPsql implements ReizigerDAO {
 
         String q = "INSERT INTO reiziger (reiziger_id, voorletters, tussenvoegsel, achternaam, geboortedatum) VALUES (?, ?, ?, ?, ?)";
 
-        try (PreparedStatement pst = this.conn.prepareStatement(q)) {
+        try (PreparedStatement pst = conn.prepareStatement(q)) {
             pst.setInt(1, reiziger.getId());
             pst.setString(2, reiziger.getVoorletters());
             pst.setString(3, reiziger.getTussenvoegsel());
@@ -39,7 +44,7 @@ public class ReizigerDAOPsql implements ReizigerDAO {
                 "geboortedatum = ? " +
                 "WHERE reiziger_id = ?";
 
-        try (PreparedStatement pst = this.conn.prepareStatement(q)) {
+        try (PreparedStatement pst = conn.prepareStatement(q)) {
             pst.setString(1, reiziger.getVoorletters());
             pst.setString(2, reiziger.getTussenvoegsel());
             pst.setString(3, reiziger.getAchternaam());
@@ -64,7 +69,7 @@ public class ReizigerDAOPsql implements ReizigerDAO {
                 "achternaam = ? AND " +
                 "geboortedatum = ?)";
 
-        try (PreparedStatement pst = this.conn.prepareStatement(q)) {
+        try (PreparedStatement pst = conn.prepareStatement(q)) {
             pst.setInt(1, reiziger.getId());
             pst.setString(2, reiziger.getVoorletters());
             pst.setString(3, reiziger.getTussenvoegsel());
@@ -84,7 +89,7 @@ public class ReizigerDAOPsql implements ReizigerDAO {
 
         String q = "SELECT * FROM reiziger WHERE reiziger_id=?";
 
-        try (PreparedStatement pst = this.conn.prepareStatement(q)) {
+        try (PreparedStatement pst = conn.prepareStatement(q)) {
             pst.setInt(1, id);
             ResultSet rs = pst.executeQuery();
             rs.next();
@@ -107,7 +112,7 @@ public class ReizigerDAOPsql implements ReizigerDAO {
 
         String q = "SELECT * FROM reiziger WHERE geboortedatum=?";
 
-        try (PreparedStatement pst = this.conn.prepareStatement(q)) {
+        try (PreparedStatement pst = conn.prepareStatement(q)) {
             pst.setDate(1, java.sql.Date.valueOf(datum));
             ResultSet rs = pst.executeQuery();
             while (rs.next()) {
@@ -131,7 +136,7 @@ public class ReizigerDAOPsql implements ReizigerDAO {
     public List<Reiziger> findAll() {
         List<Reiziger> reizigers = new ArrayList<>();
 
-        try (Statement st = this.conn.createStatement();
+        try (Statement st = conn.createStatement();
             ResultSet rs = st.executeQuery("SELECT * FROM reiziger")) {
             while (rs.next()) {
                 Reiziger reiziger = new Reiziger();

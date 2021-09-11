@@ -12,8 +12,14 @@ public class Main {
         try (Connection conn = DriverManager.getConnection(url, props)) {
 //        String url = "jdbc:postgresql://localhost:5432/ovchip?user=postgres&password=postgres&ssl=true"; Alternatieve methode verbinding DB
 //        Connection conn = DriverManager.getConnection(url);
-            ReizigerDAO rDAOPsql = new ReizigerDAOPsql(conn);
+            ReizigerDAOPsql rDAOPsql = new ReizigerDAOPsql(conn);
+            AdresDAOPsql aDAOPsql = new AdresDAOPsql(conn);
+
+            rDAOPsql.setAdao(aDAOPsql);
+            aDAOPsql.setRdao(rDAOPsql);
+
             testReizigerDAO(rDAOPsql);
+            testAdresDAO(aDAOPsql);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -22,7 +28,7 @@ public class Main {
 
     /**
      * P2. Reiziger DAO: persistentie van een klasse
-     *
+     * <p>
      * Deze methode test de CRUD-functionaliteit van de Reiziger DAO
      *
      * @throws SQLException
@@ -49,7 +55,7 @@ public class Main {
         // Voeg aanvullende tests van de ontbrekende CRUD-operaties in.
         // Maak een nieuwe reiziger aan en persisteer deze in de database. Vind deze bij zijn id.
         gbdatum = "1999-03-13";
-        int reizigerId = 99;
+        int reizigerId = 6;
         Reiziger hieu = new Reiziger(reizigerId, "C.H.M", "", "Bui", java.sql.Date.valueOf(gbdatum));
         rdao.save(hieu);
         System.out.println(String.format("[Test] ReizigerDao.findById() geeft de volgende reiziger met ID '%d': ", reizigerId) + rdao.findById(reizigerId) + "\n");
@@ -73,12 +79,54 @@ public class Main {
         }
         System.out.println();
 
-        // Verwijder de aangemaakte reizigers uit de vorige tests uit de database
+        // Verwijder een aangemaakte reiziger uit de database
         reizigers = rdao.findAll();
         System.out.print("[Test] Eerst " + reizigers.size() + " reizigers, na ReizigerDAO.delete() ");
         rdao.delete(sietske);
-        rdao.delete(hieu);
         reizigers = rdao.findAll();
         System.out.println(reizigers.size() + " reizigers\n");
+    }
+
+
+    /**
+     * P3. Adres DAO: persistentie van twee klassen met een één-op-één-relatie
+     * <p>
+     * Deze methode test de CRUD-functionaliteit van de Adres DAO
+     *
+     * @throws SQLException
+     */
+    private static void testAdresDAO(AdresDAO adao) throws SQLException {
+        System.out.println("\n---------- Test AdresDAO -------------");
+
+        // Haal alle adressen op uit de database
+        List<Adres> adressen = adao.findAll();
+        System.out.println("[Test] AdresDAO.findAll() geeft de volgende adressen:");
+        for (Adres adres : adressen) {
+            System.out.println(adres);
+        }
+        System.out.println();
+
+        // Maak een adres aan en persisteer deze in de database
+        Adres adres = new Adres(6, "3607BL", "556", "Duivenkamp", "Maarssen", 6);
+        System.out.print("[Test] Eerst " + adressen.size() + " adressen, na AdresDAO.save() ");
+        adao.save(adres);
+        adressen = adao.findAll();
+        System.out.println(adressen.size() + " adressen\n");
+
+        // Update huisnummer van een adres gezocht op reiziger
+        String gbdatum = "1999-03-13";
+        Reiziger hieu = new Reiziger(6, "C.H.M", "van de", "Buurt", java.sql.Date.valueOf(gbdatum));
+        System.out.print(String.format("[Test] Huisnummer van adres #%d was %s, na AdresDAO.update() is het ",
+                adao.findByReiziger(hieu).getId(),
+                adao.findByReiziger(hieu).getHuisnummer()));
+        adres.setHuisnummer("551");
+        adao.update(adres);
+        System.out.println(adao.findByReiziger(hieu).getHuisnummer() + ".");
+
+        // Delete aangemaakte adres
+        System.out.print("\n[Test] Eerst " + adressen.size() + " adressen, na AdresDAO.save() ");
+        adao.delete(adres);
+        adressen = adao.findAll();
+        System.out.println(adressen.size() + " adressen\n");
     }
 }
