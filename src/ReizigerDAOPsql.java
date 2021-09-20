@@ -5,6 +5,7 @@ import java.util.List;
 public class ReizigerDAOPsql implements ReizigerDAO {
     private Connection conn;
     private AdresDAO adao;
+    private OVChipkaartDAO ovcdao;
 
     public ReizigerDAOPsql(Connection conn) {
         this.conn = conn;
@@ -12,6 +13,10 @@ public class ReizigerDAOPsql implements ReizigerDAO {
 
     public void setAdao (AdresDAO adao) {
         this.adao = adao;
+    }
+
+    public void setOVCdao (OVChipkaartDAO ovcdao) {
+        this.ovcdao = ovcdao;
     }
 
     @Override

@@ -14,9 +14,14 @@ public class Main {
 //        Connection conn = DriverManager.getConnection(url);
             ReizigerDAOPsql rDAOPsql = new ReizigerDAOPsql(conn);
             AdresDAOPsql aDAOPsql = new AdresDAOPsql(conn);
+            OVChipkaartDAOPsql ovcDAOPsql = new OVChipkaartDAOPsql(conn);
 
             rDAOPsql.setAdao(aDAOPsql);
+            rDAOPsql.setOVCdao(ovcDAOPsql);
+
             aDAOPsql.setRdao(rDAOPsql);
+
+            ovcDAOPsql.setRdao(rDAOPsql);
 
             testReizigerDAO(rDAOPsql);
             testAdresDAO(aDAOPsql);
