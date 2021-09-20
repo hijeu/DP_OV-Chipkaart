@@ -109,7 +109,7 @@ public class ReizigerDAOPsql implements ReizigerDAO {
             pst.setString(3, reiziger.getTussenvoegsel());
             pst.setString(4, reiziger.getAchternaam());
             pst.setDate(5, reiziger.getGeboortedatum());
-            recordsDeleted = Math.abs(pst.executeUpdate());
+            recordsDeleted = pst.executeUpdate();
 
             Adres adres = reiziger.getAdres();
             if (adres != null) {
@@ -133,7 +133,6 @@ public class ReizigerDAOPsql implements ReizigerDAO {
         return recordsDeleted > 0;
     }
 
-    ////////////////////////// OVC
     @Override
     public Reiziger findById(int id) {
         Reiziger reiziger = new Reiziger();
@@ -152,6 +151,8 @@ public class ReizigerDAOPsql implements ReizigerDAO {
             rs.close();
             Adres adres = adao.findByReiziger(reiziger);
             reiziger.setAdres(adres);
+            List <OVChipkaart> ovChipkaarten = ovcdao.findByReiziger(reiziger);
+            reiziger.setOVChipkaarten(ovChipkaarten);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -159,7 +160,6 @@ public class ReizigerDAOPsql implements ReizigerDAO {
         return reiziger;
     }
 
-    ////////////////////////// OVC
     @Override
     public List<Reiziger> findByGbdatum(String datum) {
         List<Reiziger> reizigers = new ArrayList<>();
@@ -167,8 +167,8 @@ public class ReizigerDAOPsql implements ReizigerDAO {
         String q = "SELECT * FROM reiziger WHERE geboortedatum=?";
 
         try (PreparedStatement pst = conn.prepareStatement(q)) {
-            pst.setDate(1, java.sql.Date.valueOf(datum));
-            ResultSet rs = pst.executeQuery();
+             pst.setDate(1, java.sql.Date.valueOf(datum));
+             ResultSet rs = pst.executeQuery();
             while (rs.next()) {
                 Reiziger reiziger = new Reiziger();
                 reiziger.setId(rs.getInt("reiziger_id"));
@@ -179,6 +179,8 @@ public class ReizigerDAOPsql implements ReizigerDAO {
                 Adres adres = adao.findByReiziger(reiziger);
                 reiziger.setAdres(adres);
                 reizigers.add(reiziger);
+                List<OVChipkaart> ovChipkaarten = ovcdao.findByReiziger(reiziger);
+                reiziger.setOVChipkaarten(ovChipkaarten);
             }
             rs.close();
         } catch (Exception e) {
@@ -188,7 +190,6 @@ public class ReizigerDAOPsql implements ReizigerDAO {
         return reizigers;
     }
 
-    ////////////////////////// OVC
     @Override
     public Reiziger findByOVChipkaart(OVChipkaart ovChipkaart) {
         Reiziger reiziger = new Reiziger();
@@ -206,15 +207,18 @@ public class ReizigerDAOPsql implements ReizigerDAO {
             e.printStackTrace();
         }
 
-        q = "SELECT * FROM reiziger WHERE reiziger_id = " + reizigerId;
+        q = "SELECT * FROM reiziger WHERE reiziger_id = ?";
 
-        try (PreparedStatement pst = conn.prepareStatement(q);
-            ResultSet rs = pst.executeQuery()) {
+        try (PreparedStatement pst = conn.prepareStatement(q)) {
+            pst.setInt(1, reizigerId);
+            ResultSet rs = pst.executeQuery();
+            rs.next();
             reiziger.setId(rs.getInt("reiziger_id"));
             reiziger.setVoorletters(rs.getString("voorletters"));
             reiziger.setTussenvoegsel(rs.getString("tussenvoegsel"));
             reiziger.setAchternaam(rs.getString("achternaam"));
             reiziger.setGeboortedatum(rs.getDate("geboortedatum"));
+            rs.close();
             Adres adres = adao.findByReiziger(reiziger);
             reiziger.setAdres(adres);
             List<OVChipkaart> ovChipkaarten = ovcdao.findByReiziger(reiziger);
@@ -226,7 +230,6 @@ public class ReizigerDAOPsql implements ReizigerDAO {
         return reiziger;
     }
 
-    ////////////////////////// OVC
     @Override
     public List<Reiziger> findAll() {
         List<Reiziger> reizigers = new ArrayList<>();
@@ -243,7 +246,8 @@ public class ReizigerDAOPsql implements ReizigerDAO {
                 Adres adres = adao.findByReiziger(reiziger);
                 reiziger.setAdres(adres);
                 reizigers.add(reiziger);
-
+                List<OVChipkaart> ovChipkaarten = ovcdao.findByReiziger(reiziger);
+                reiziger.setOVChipkaarten(ovChipkaarten);
             }
         } catch (Exception e) {
             e.printStackTrace();

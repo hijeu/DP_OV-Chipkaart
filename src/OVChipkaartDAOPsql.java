@@ -41,19 +41,50 @@ public class OVChipkaartDAOPsql implements OVChipkaartDAO {
     public boolean update(OVChipkaart ovChipkaart) {
         int recordsUpdated = 0;
 
+        String q = "UPDATE ov_chipkaart SET geldig_tot = ?, " +
+                "klasse = ?, " +
+                "saldo = ?, " +
+                "reiziger_id = ? " +
+                "WHERE kaart_nummer = ?";
+
+        try (PreparedStatement pst = conn.prepareStatement(q)) {
+            pst.setDate(1, ovChipkaart.getGeldigTot());
+            pst.setInt(2, ovChipkaart.getKlasse());
+            pst.setDouble(3, ovChipkaart.getSaldo());
+            pst.setInt(4, ovChipkaart.getReizigerId());
+            pst.setInt(5, ovChipkaart.getKaartNummer());
+            pst.executeUpdate();
+            recordsUpdated = pst.getUpdateCount();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         return recordsUpdated > 0;
     }
 
-    // Delete Delete
     @Override
     public boolean delete(OVChipkaart ovChipkaart) {
         int recordsDeleted = 0;
 
+        String q = "DELETE FROM ov_chipkaart WHERE kaart_nummer = ? AND" +
+                " geldig_tot = ? AND" +
+                " klasse = ? AND " +
+                "saldo = ? AND" +
+                " reiziger_id = ?";
+
+        try (PreparedStatement pst = conn.prepareStatement(q)) {
+            pst.setInt(1, ovChipkaart.getKaartNummer());
+            pst.setDate(2, ovChipkaart.getGeldigTot());
+            pst.setInt(3, ovChipkaart.getKlasse());
+            pst.setDouble(4, ovChipkaart.getSaldo());
+            pst.setInt(5, ovChipkaart.getReizigerId());
+            recordsDeleted = pst.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         return recordsDeleted > 0;
     }
-
-
-    // Read Select (find methods)
 
     @Override
     public OVChipkaart findById (int id) {
@@ -61,14 +92,15 @@ public class OVChipkaartDAOPsql implements OVChipkaartDAO {
 
         String q = "SELECT * FROM ov_chipkaart WHERE kaart_nummer = ?";
 
-        try (PreparedStatement pst = conn.prepareStatement(q);
-             ResultSet rs = pst.executeQuery()) {
+        try (PreparedStatement pst = conn.prepareStatement(q)) {
             pst.setInt(1, id);
+            ResultSet rs = pst.executeQuery();
             rs.next();
             ovChipkaart.setKaartNummer(rs.getInt("kaart_nummer"));
             ovChipkaart.setGeldigTot(rs.getDate("geldig_tot"));
             ovChipkaart.setKlasse(rs.getInt("klasse"));
             ovChipkaart.setSaldo(rs.getDouble("saldo"));
+            rs.close();
 
             Reiziger reiziger = rdao.findByOVChipkaart(ovChipkaart);
             ovChipkaart.setReizigerId(reiziger.getId());
@@ -87,13 +119,18 @@ public class OVChipkaartDAOPsql implements OVChipkaartDAO {
 
         String q = "SELECT * FROM ov_chipkaart WHERE reiziger_id = ?";
 
-        try (PreparedStatement pst = conn.prepareStatement(q);
-             ResultSet rs = pst.executeQuery()) {
+        try (PreparedStatement pst = conn.prepareStatement(q)) {
             pst.setInt(1, reiziger.getId());
-
+            ResultSet rs = pst.executeQuery();
             while (rs.next()) {
-
+                ovChipkaart.setKaartNummer(rs.getInt("kaart_nummer"));
+                ovChipkaart.setGeldigTot(rs.getDate("geldig_tot"));
+                ovChipkaart.setKlasse(rs.getInt("klasse"));
+                ovChipkaart.setSaldo(rs.getDouble("saldo"));
+                ovChipkaart.setReizigerId(reiziger.getId());
+                ovChipkaarten.add(ovChipkaart);
             }
+            rs.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -115,11 +152,9 @@ public class OVChipkaartDAOPsql implements OVChipkaartDAO {
                 ovChipkaart.setGeldigTot(rs.getDate("geldig_tot"));
                 ovChipkaart.setKlasse(rs.getInt("klasse"));
                 ovChipkaart.setSaldo(rs.getDouble("saldo"));
-                rs.close();
                 Reiziger reiziger = rdao.findByOVChipkaart(ovChipkaart);
                 ovChipkaart.setReizigerId(reiziger.getId());
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }

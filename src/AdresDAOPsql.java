@@ -78,7 +78,7 @@ public class AdresDAOPsql implements AdresDAO {
             pst.setString(4, adres.getStraat());
             pst.setString(5, adres.getWoonplaats());
             pst.setInt(6, adres.getReizigerId());
-            recordsDeleted = Math.abs(pst.executeUpdate());
+            recordsDeleted = pst.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -92,9 +92,9 @@ public class AdresDAOPsql implements AdresDAO {
 
         String q = "SELECT * FROM adres WHERE reiziger_id = ?";
 
-        try (PreparedStatement pst = conn.prepareStatement(q);
-             ResultSet rs = pst.executeQuery()) {
+        try (PreparedStatement pst = conn.prepareStatement(q)) {
             pst.setInt(1, reiziger.getId());
+                ResultSet rs = pst.executeQuery();
             if (rs.next()) {
                 adres.setId(rs.getInt("adres_id"));
                 adres.setPostcode(rs.getString("postcode"));
@@ -105,7 +105,7 @@ public class AdresDAOPsql implements AdresDAO {
             } else {
                 adres = null;
             }
-
+            rs.close();
         } catch (Exception e) {
             e.printStackTrace();
         }

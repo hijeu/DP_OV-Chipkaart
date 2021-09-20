@@ -25,6 +25,7 @@ public class Main {
 
             testReizigerDAO(rDAOPsql);
             testAdresDAO(aDAOPsql);
+            testOVChipkaartDAO(ovcDAOPsql);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -134,4 +135,47 @@ public class Main {
         adressen = adao.findAll();
         System.out.println(adressen.size() + " adressen\n");
     }
+
+    /**
+     * P4. OVChipkaart DAO: persistentie van twee klassen met een één-op-veel-relatie
+     * <p>
+     * Deze methode test de CRUD-functionaliteit van de OVChipkaart DAO
+     *
+     * @throws SQLException
+     */
+    private static void testOVChipkaartDAO(OVChipkaartDAO ovcdao) throws SQLException {
+        System.out.println("\n---------- Test OVChipkaartDAO -------------");
+
+        // Haal alle ovchipkaarten op uit de database
+        List<OVChipkaart> ovChipkaarten = ovcdao.findAll();
+        System.out.println("[Test] OVChipkaartDAO.findAll() geeft de volgende adressen:");
+        for (OVChipkaart ovChipkaart : ovChipkaarten) {
+            System.out.println(ovChipkaart);
+        }
+        System.out.println();
+
+        // Maak een ovchipkaart aan en persisteer deze in de database
+        Date geligheidsdatum = java.sql.Date.valueOf("2022-01-01");
+        OVChipkaart ovChipkaart = new OVChipkaart(1, geligheidsdatum, 1, 100.00, 6);
+        System.out.print("[Test] Eerst " + ovChipkaarten.size() + " ovchipkaarten, na OVChipkaartDAO.save() ");
+        ovcdao.save(ovChipkaart);
+        ovChipkaarten = ovcdao.findAll();
+        System.out.println(ovChipkaarten.size() + " ovchipkaarten\n");
+
+        ////////
+        // Update saldo van een ovchipkaart gevonden op kaart_nummer in de database
+        System.out.print(String.format("[Test] Saldo van ovchipkaart #%d was €%f.2f, na OVChipkaartDAO.update() is het ",
+                ovcdao.findById(1).getKaartNummer(),
+                ovcdao.findById(1).getSaldo()));
+        ovcdao.findById(1).setSaldo(500.00);
+        ovcdao.update(ovChipkaart);
+        System.out.println(String.format("€%f.2f", ovcdao.findById(1).getSaldo()) + ".");
+
+        // Delete aangemaakte ovChipkaart
+        System.out.print("\n[Test] Eerst " + ovChipkaarten.size() + " ovchipkaarten, na OVChipkaartDAO.delete() ");
+        ovcdao.delete(ovChipkaart);
+        ovChipkaarten = ovcdao.findAll();
+        System.out.println(ovChipkaarten.size() + " ovchipkaarten\n");
+    }
+
 }

@@ -58,8 +58,16 @@ public class OVChipkaart {
         this.reizigerId = reizigerId;
     }
 
-    /////////////
     public String toString() {
-        return String.format("OVChipkaart {%d, %s, %d, %d.2f, %d}");
+        String s;
+        s = String.format("OVChipkaart {#%d, Geldig tot: %s, %d",
+                getKaartNummer(),
+                getGeldigTot(),
+                getKlasse());
+
+        s += String.format("eklasse, Saldo: %f.2f, Reiziger: #%d",
+                getSaldo(),
+                getReizigerId());
+        return s;
     }
 }
