@@ -6,5 +6,6 @@ public interface ReizigerDAO {
     boolean delete(Reiziger reiziger);
     Reiziger findById(int id);
     List<Reiziger> findByGbdatum(String datum);
+    Reiziger findByOVChipkaart(OVChipkaart ovChipkaart);
     List<Reiziger> findAll();
 }

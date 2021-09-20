@@ -37,6 +37,12 @@ public class ReizigerDAOPsql implements ReizigerDAO {
                 adao.save(reiziger.getAdres());
             }
 
+            List<OVChipkaart> ovChipkaarten = reiziger.getOVChipkaarten();
+            if (!ovChipkaarten.isEmpty()) {
+                for (OVChipkaart ovChipkaart : ovChipkaarten) {
+                    ovcdao.save(ovChipkaart);
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -63,18 +69,21 @@ public class ReizigerDAOPsql implements ReizigerDAO {
             pst.executeUpdate();
             recordsUpdated = pst.getUpdateCount();
 
-            if (reiziger.getAdres() != null) {
-                String qCheckIfAdresExistsInDb = "SELECT * FROM adres WHERE adres_id = ?";
-                try (PreparedStatement pstCheckIfAdresExistsInDb = conn.prepareStatement(qCheckIfAdresExistsInDb);
-                ResultSet rs = pstCheckIfAdresExistsInDb.executeQuery()) {
-                    pstCheckIfAdresExistsInDb.setInt(1, reiziger.getAdres().getId());
-                    if (rs.next()) {
-                        adao.update(reiziger.getAdres());
-                    } else {
-                        adao.save(reiziger.getAdres());
+            Adres adres = reiziger.getAdres();
+            if (adres != null) {
+                if (CheckIfAdresExistsInDb(adres)) {
+                    adao.save(adres);
+                } else {
+                    adao.update(adres);
+                }
+            }
+
+            List<OVChipkaart> ovChipkaarten = reiziger.getOVChipkaarten();
+            if (!ovChipkaarten.isEmpty()) {
+                for (OVChipkaart ovChipkaart : ovChipkaarten) {
+                    if (!CheckIfOVChipkaartExistsInDb(ovChipkaart)) {
+                        ovcdao.update(ovChipkaart);
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
             }
         } catch (Exception e) {
@@ -102,16 +111,19 @@ public class ReizigerDAOPsql implements ReizigerDAO {
             pst.setDate(5, reiziger.getGeboortedatum());
             recordsDeleted = Math.abs(pst.executeUpdate());
 
-            if (reiziger.getAdres() != null) {
-                String qCheckIfAdresExistsInDb = "SELECT * FROM adres WHERE adres_id = ?";
-                try (PreparedStatement pstCheckIfAdresExistsInDb = conn.prepareStatement(qCheckIfAdresExistsInDb);
-                     ResultSet rs = pstCheckIfAdresExistsInDb.executeQuery()) {
-                    pstCheckIfAdresExistsInDb.setInt(1, reiziger.getAdres().getId());
-                    if (rs.next()) {
-                        adao.delete(reiziger.getAdres());
+            Adres adres = reiziger.getAdres();
+            if (adres != null) {
+                if (CheckIfAdresExistsInDb(adres)) {
+                    adao.delete(adres);
+                }
+            }
+
+            List<OVChipkaart> ovChipkaarten = reiziger.getOVChipkaarten();
+            if (!ovChipkaarten.isEmpty()) {
+                for (OVChipkaart ovChipkaart : ovChipkaarten) {
+                    if (CheckIfOVChipkaartExistsInDb(ovChipkaart)) {
+                        ovcdao.delete(ovChipkaart);
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
             }
         } catch (Exception e) {
@@ -121,6 +133,7 @@ public class ReizigerDAOPsql implements ReizigerDAO {
         return recordsDeleted > 0;
     }
 
+    ////////////////////////// OVC
     @Override
     public Reiziger findById(int id) {
         Reiziger reiziger = new Reiziger();
@@ -137,8 +150,8 @@ public class ReizigerDAOPsql implements ReizigerDAO {
             reiziger.setAchternaam(rs.getString("achternaam"));
             reiziger.setGeboortedatum(rs.getDate("geboortedatum"));
             rs.close();
-            Adres a = adao.findByReiziger(reiziger);
-            reiziger.setAdres(a);
+            Adres adres = adao.findByReiziger(reiziger);
+            reiziger.setAdres(adres);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -146,6 +159,7 @@ public class ReizigerDAOPsql implements ReizigerDAO {
         return reiziger;
     }
 
+    ////////////////////////// OVC
     @Override
     public List<Reiziger> findByGbdatum(String datum) {
         List<Reiziger> reizigers = new ArrayList<>();
@@ -162,8 +176,8 @@ public class ReizigerDAOPsql implements ReizigerDAO {
                 reiziger.setTussenvoegsel(rs.getString("tussenvoegsel"));
                 reiziger.setAchternaam(rs.getString("achternaam"));
                 reiziger.setGeboortedatum(rs.getDate("geboortedatum"));
-                Adres a = adao.findByReiziger(reiziger);
-                reiziger.setAdres(a);
+                Adres adres = adao.findByReiziger(reiziger);
+                reiziger.setAdres(adres);
                 reizigers.add(reiziger);
             }
             rs.close();
@@ -174,6 +188,45 @@ public class ReizigerDAOPsql implements ReizigerDAO {
         return reizigers;
     }
 
+    ////////////////////////// OVC
+    @Override
+    public Reiziger findByOVChipkaart(OVChipkaart ovChipkaart) {
+        Reiziger reiziger = new Reiziger();
+        int reizigerId = 0;
+
+        String q = "SELECT * FROM ov_chipkaart WHERE kaart_nummer ?";
+
+        try (PreparedStatement pst = conn.prepareStatement(q)) {
+            pst.setInt(1, ovChipkaart.getKaartNummer());
+            ResultSet rs = pst.executeQuery();
+            rs.next();
+            reizigerId = rs.getInt("reiziger_id");
+            rs.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        q = "SELECT * FROM reiziger WHERE reiziger_id = " + reizigerId;
+
+        try (PreparedStatement pst = conn.prepareStatement(q);
+            ResultSet rs = pst.executeQuery()) {
+            reiziger.setId(rs.getInt("reiziger_id"));
+            reiziger.setVoorletters(rs.getString("voorletters"));
+            reiziger.setTussenvoegsel(rs.getString("tussenvoegsel"));
+            reiziger.setAchternaam(rs.getString("achternaam"));
+            reiziger.setGeboortedatum(rs.getDate("geboortedatum"));
+            Adres adres = adao.findByReiziger(reiziger);
+            reiziger.setAdres(adres);
+            List<OVChipkaart> ovChipkaarten = ovcdao.findByReiziger(reiziger);
+            reiziger.setOVChipkaarten(ovChipkaarten);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return reiziger;
+    }
+
+    ////////////////////////// OVC
     @Override
     public List<Reiziger> findAll() {
         List<Reiziger> reizigers = new ArrayList<>();
@@ -187,14 +240,49 @@ public class ReizigerDAOPsql implements ReizigerDAO {
                 reiziger.setTussenvoegsel(rs.getString("tussenvoegsel"));
                 reiziger.setAchternaam(rs.getString("achternaam"));
                 reiziger.setGeboortedatum(rs.getDate("geboortedatum"));
-                Adres a = adao.findByReiziger(reiziger);
-                reiziger.setAdres(a);
+                Adres adres = adao.findByReiziger(reiziger);
+                reiziger.setAdres(adres);
                 reizigers.add(reiziger);
+
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         return reizigers;
+    }
+
+    public boolean CheckIfAdresExistsInDb(Adres adres) {
+        boolean booleanCheckIfAdresExistsInDb = false;
+
+        String qCheckIfAdresExistsInDb = "SELECT * FROM adres WHERE adres_id = ?";
+        try (PreparedStatement pstCheckIfAdresExistsInDb = conn.prepareStatement(qCheckIfAdresExistsInDb);
+             ResultSet rs = pstCheckIfAdresExistsInDb.executeQuery()) {
+            pstCheckIfAdresExistsInDb.setInt(1, adres.getId());
+            if (rs.next()) {
+                booleanCheckIfAdresExistsInDb = true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return booleanCheckIfAdresExistsInDb;
+    }
+
+    public boolean CheckIfOVChipkaartExistsInDb(OVChipkaart ovChipkaart) {
+        boolean booleanOVChipkaartExistsInDb = false;
+
+        String qCheckIfOVChipkaartExistsInDb = "SELECT * FROM ov_chipkaart WHERE kaart_nummer = ?";
+        try (PreparedStatement pstCheckIfOVChipkaartExistsInDb = conn.prepareStatement(qCheckIfOVChipkaartExistsInDb);
+             ResultSet rs = pstCheckIfOVChipkaartExistsInDb.executeQuery()) {
+            pstCheckIfOVChipkaartExistsInDb.setInt(1, ovChipkaart.getKaartNummer());
+            if (rs.next()) {
+                booleanOVChipkaartExistsInDb = true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return booleanOVChipkaartExistsInDb;
     }
 }

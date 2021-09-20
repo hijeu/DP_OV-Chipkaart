@@ -92,9 +92,9 @@ public class AdresDAOPsql implements AdresDAO {
 
         String q = "SELECT * FROM adres WHERE reiziger_id = ?";
 
-        try (PreparedStatement pst = conn.prepareStatement(q)) {
+        try (PreparedStatement pst = conn.prepareStatement(q);
+             ResultSet rs = pst.executeQuery()) {
             pst.setInt(1, reiziger.getId());
-            ResultSet rs = pst.executeQuery();
             if (rs.next()) {
                 adres.setId(rs.getInt("adres_id"));
                 adres.setPostcode(rs.getString("postcode"));
@@ -105,7 +105,6 @@ public class AdresDAOPsql implements AdresDAO {
             } else {
                 adres = null;
             }
-            rs.close();
 
         } catch (Exception e) {
             e.printStackTrace();

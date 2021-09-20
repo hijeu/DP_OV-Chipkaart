@@ -57,4 +57,9 @@ public class OVChipkaart {
     public void setReizigerId(int reizigerId) {
         this.reizigerId = reizigerId;
     }
+
+    /////////////
+    public String toString() {
+        return String.format("OVChipkaart {%d, %s, %d, %d.2f, %d}");
+    }
 }
