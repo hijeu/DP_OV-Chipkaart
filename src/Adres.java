@@ -67,8 +67,7 @@ public class Adres {
     }
 
     public String toString() {
-        return String.format("Reiziger {#%d. Adres {#%d %s %s, %s, %s}}",
-                getReizigerId(),
+        return String.format(" Adres {#%d %s %s, %s, %s}",
                 getId(),
                 getStraat(),
                 getHuisnummer(),

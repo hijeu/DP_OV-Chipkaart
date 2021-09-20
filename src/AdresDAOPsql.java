@@ -95,14 +95,18 @@ public class AdresDAOPsql implements AdresDAO {
         try (PreparedStatement pst = conn.prepareStatement(q)) {
             pst.setInt(1, reiziger.getId());
             ResultSet rs = pst.executeQuery();
-            rs.next();
-            adres.setId(rs.getInt("adres_id"));
-            adres.setPostcode(rs.getString("postcode"));
-            adres.setHuisnummer(rs.getString("huisnummer"));
-            adres.setStraat(rs.getString("straat"));
-            adres.setWoonplaats(rs.getString("woonplaats"));
-            adres.setReizigerId(rs.getInt("reiziger_id"));
+            if (rs.next()) {
+                adres.setId(rs.getInt("adres_id"));
+                adres.setPostcode(rs.getString("postcode"));
+                adres.setHuisnummer(rs.getString("huisnummer"));
+                adres.setStraat(rs.getString("straat"));
+                adres.setWoonplaats(rs.getString("woonplaats"));
+                adres.setReizigerId(rs.getInt("reiziger_id"));
+            } else {
+                adres = null;
+            }
             rs.close();
+
         } catch (Exception e) {
             e.printStackTrace();
         }

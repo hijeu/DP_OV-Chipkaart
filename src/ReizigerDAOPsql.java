@@ -27,6 +27,11 @@ public class ReizigerDAOPsql implements ReizigerDAO {
             pst.setString(4, reiziger.getAchternaam());
             pst.setDate(5, reiziger.getGeboortedatum());
             recordsSaved = pst.executeUpdate();
+
+            if (reiziger.getAdres() != null) {
+                adao.save(reiziger.getAdres());
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -52,6 +57,21 @@ public class ReizigerDAOPsql implements ReizigerDAO {
             pst.setInt(5, reiziger.getId());
             pst.executeUpdate();
             recordsUpdated = pst.getUpdateCount();
+
+            if (reiziger.getAdres() != null) {
+                String qCheckIfAdresExistsInDb = "SELECT * FROM adres WHERE adres_id = ?";
+                try (PreparedStatement pstCheckIfAdresExistsInDb = conn.prepareStatement(qCheckIfAdresExistsInDb);
+                ResultSet rs = pstCheckIfAdresExistsInDb.executeQuery()) {
+                    pstCheckIfAdresExistsInDb.setInt(1, reiziger.getAdres().getId());
+                    if (rs.next()) {
+                        adao.update(reiziger.getAdres());
+                    } else {
+                        adao.save(reiziger.getAdres());
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -76,6 +96,19 @@ public class ReizigerDAOPsql implements ReizigerDAO {
             pst.setString(4, reiziger.getAchternaam());
             pst.setDate(5, reiziger.getGeboortedatum());
             recordsDeleted = Math.abs(pst.executeUpdate());
+
+            if (reiziger.getAdres() != null) {
+                String qCheckIfAdresExistsInDb = "SELECT * FROM adres WHERE adres_id = ?";
+                try (PreparedStatement pstCheckIfAdresExistsInDb = conn.prepareStatement(qCheckIfAdresExistsInDb);
+                     ResultSet rs = pstCheckIfAdresExistsInDb.executeQuery()) {
+                    pstCheckIfAdresExistsInDb.setInt(1, reiziger.getAdres().getId());
+                    if (rs.next()) {
+                        adao.delete(reiziger.getAdres());
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -99,6 +132,8 @@ public class ReizigerDAOPsql implements ReizigerDAO {
             reiziger.setAchternaam(rs.getString("achternaam"));
             reiziger.setGeboortedatum(rs.getDate("geboortedatum"));
             rs.close();
+            Adres a = adao.findByReiziger(reiziger);
+            reiziger.setAdres(a);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -122,6 +157,8 @@ public class ReizigerDAOPsql implements ReizigerDAO {
                 reiziger.setTussenvoegsel(rs.getString("tussenvoegsel"));
                 reiziger.setAchternaam(rs.getString("achternaam"));
                 reiziger.setGeboortedatum(rs.getDate("geboortedatum"));
+                Adres a = adao.findByReiziger(reiziger);
+                reiziger.setAdres(a);
                 reizigers.add(reiziger);
             }
             rs.close();
@@ -145,6 +182,8 @@ public class ReizigerDAOPsql implements ReizigerDAO {
                 reiziger.setTussenvoegsel(rs.getString("tussenvoegsel"));
                 reiziger.setAchternaam(rs.getString("achternaam"));
                 reiziger.setGeboortedatum(rs.getDate("geboortedatum"));
+                Adres a = adao.findByReiziger(reiziger);
+                reiziger.setAdres(a);
                 reizigers.add(reiziger);
             }
         } catch (Exception e) {

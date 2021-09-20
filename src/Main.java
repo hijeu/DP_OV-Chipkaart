@@ -124,7 +124,7 @@ public class Main {
         System.out.println(adao.findByReiziger(hieu).getHuisnummer() + ".");
 
         // Delete aangemaakte adres
-        System.out.print("\n[Test] Eerst " + adressen.size() + " adressen, na AdresDAO.save() ");
+        System.out.print("\n[Test] Eerst " + adressen.size() + " adressen, na AdresDAO.delete() ");
         adao.delete(adres);
         adressen = adao.findAll();
         System.out.println(adressen.size() + " adressen\n");

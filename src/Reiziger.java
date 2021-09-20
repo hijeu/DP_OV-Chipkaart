@@ -60,30 +60,31 @@ public class Reiziger {
         this.geboortedatum = geboortedatum;
     }
 
-    public String toString() {
-        String s;
+    public Adres getAdres() {
+        return adres;
+    }
 
-        if (adres == null) {
-            s = "#" + getId() + ": " + getVoorletters() + ". ";
-            if (!Objects.equals(getTussenvoegsel(), "") && getTussenvoegsel() != null) {
-                s += getTussenvoegsel() + " ";
-            }
-            s += getAchternaam() + " (" + getGeboortedatum() + ")";
-        } else {
-            s = String.format("Reiziger {#%d %s. ",
-                    getId(),
-                    getVoorletters());
-            if (!Objects.equals(getTussenvoegsel(), "") && getTussenvoegsel() != null) {
-                s += getTussenvoegsel() + " ";
-            }
-            s += String.format("%s, geb. ", getAchternaam()) + getGeboortedatum();
-            s += String.format(", Adres {#%d %s %s, %s, %s}}",
-                    adres.getId(),
-                    adres.getStraat(),
-                    adres.getHuisnummer(),
-                    adres.getPostcode(),
-                    adres.getWoonplaats());
+    public void setAdres(Adres adres) {
+        this.adres = adres;
+    }
+
+    public String toString() {
+        String s = String.format("Reiziger {#%d %s. ",
+                getId(),
+                getVoorletters());
+
+        if (!Objects.equals(getTussenvoegsel(), "") && getTussenvoegsel() != null) {
+            s += getTussenvoegsel() + " ";
         }
+
+        s += getAchternaam() + " (" + getGeboortedatum() + ")";
+
+        if (adres != null) {
+            s += adres.toString();
+        }
+
+        s += "}";
+
         return s;
     }
 }
