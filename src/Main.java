@@ -178,5 +178,4 @@ public class Main {
         ovChipkaarten = ovcdao.findAll();
         System.out.println(ovChipkaarten.size() + " ovchipkaarten\n");
     }
-
 }
