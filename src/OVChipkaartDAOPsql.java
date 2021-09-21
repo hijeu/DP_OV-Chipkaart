@@ -154,6 +154,7 @@ public class OVChipkaartDAOPsql implements OVChipkaartDAO {
                 ovChipkaart.setSaldo(rs.getDouble("saldo"));
                 Reiziger reiziger = rdao.findByOVChipkaart(ovChipkaart);
                 ovChipkaart.setReizigerId(reiziger.getId());
+                ovChipkaarten.add(ovChipkaart);
             }
         } catch (Exception e) {
             e.printStackTrace();

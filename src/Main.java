@@ -122,9 +122,10 @@ public class Main {
         // Update huisnummer van een adres gezocht op reiziger
         String gbdatum = "1999-03-13";
         Reiziger hieu = new Reiziger(6, "C.H.M", "van de", "Buurt", java.sql.Date.valueOf(gbdatum));
+        adres = adao.findByReiziger(hieu);
         System.out.print(String.format("[Test] Huisnummer van adres #%d was %s, na AdresDAO.update() is het ",
-                adao.findByReiziger(hieu).getId(),
-                adao.findByReiziger(hieu).getHuisnummer()));
+                adres.getId(),
+                adres.getHuisnummer()));
         adres.setHuisnummer("551");
         adao.update(adres);
         System.out.println(adao.findByReiziger(hieu).getHuisnummer() + ".");
@@ -162,14 +163,14 @@ public class Main {
         ovChipkaarten = ovcdao.findAll();
         System.out.println(ovChipkaarten.size() + " ovchipkaarten\n");
 
-        ////////
         // Update saldo van een ovchipkaart gevonden op kaart_nummer in de database
-        System.out.print(String.format("[Test] Saldo van ovchipkaart #%d was €%f.2f, na OVChipkaartDAO.update() is het ",
-                ovcdao.findById(1).getKaartNummer(),
-                ovcdao.findById(1).getSaldo()));
-        ovcdao.findById(1).setSaldo(500.00);
+        ovChipkaart = ovcdao.findById(1);
+        System.out.print(String.format("[Test] Saldo van ovchipkaart #%d was €%.2f, na OVChipkaartDAO.update() is het ",
+                ovChipkaart.getKaartNummer(),
+                ovChipkaart.getSaldo()));
+        ovChipkaart.setSaldo(500.00);
         ovcdao.update(ovChipkaart);
-        System.out.println(String.format("€%f.2f", ovcdao.findById(1).getSaldo()) + ".");
+        System.out.println(String.format("€%.2f", ovcdao.findById(1).getSaldo()) + ".");
 
         // Delete aangemaakte ovChipkaart
         System.out.print("\n[Test] Eerst " + ovChipkaarten.size() + " ovchipkaarten, na OVChipkaartDAO.delete() ");

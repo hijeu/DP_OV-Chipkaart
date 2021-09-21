@@ -65,7 +65,7 @@ public class OVChipkaart {
                 getGeldigTot(),
                 getKlasse());
 
-        s += String.format("eklasse, Saldo: %f.2f, Reiziger: #%d",
+        s += String.format("e klasse, Saldo: €%.2f, Reiziger: #%d",
                 getSaldo(),
                 getReizigerId());
         return s;

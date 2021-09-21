@@ -195,7 +195,7 @@ public class ReizigerDAOPsql implements ReizigerDAO {
         Reiziger reiziger = new Reiziger();
         int reizigerId = 0;
 
-        String q = "SELECT * FROM ov_chipkaart WHERE kaart_nummer ?";
+        String q = "SELECT * FROM ov_chipkaart WHERE kaart_nummer=?";
 
         try (PreparedStatement pst = conn.prepareStatement(q)) {
             pst.setInt(1, ovChipkaart.getKaartNummer());
@@ -207,24 +207,28 @@ public class ReizigerDAOPsql implements ReizigerDAO {
             e.printStackTrace();
         }
 
-        q = "SELECT * FROM reiziger WHERE reiziger_id = ?";
+        if (reizigerId != 0) {
+            q = "SELECT * FROM reiziger WHERE reiziger_id = ?";
 
-        try (PreparedStatement pst = conn.prepareStatement(q)) {
-            pst.setInt(1, reizigerId);
-            ResultSet rs = pst.executeQuery();
-            rs.next();
-            reiziger.setId(rs.getInt("reiziger_id"));
-            reiziger.setVoorletters(rs.getString("voorletters"));
-            reiziger.setTussenvoegsel(rs.getString("tussenvoegsel"));
-            reiziger.setAchternaam(rs.getString("achternaam"));
-            reiziger.setGeboortedatum(rs.getDate("geboortedatum"));
-            rs.close();
-            Adres adres = adao.findByReiziger(reiziger);
-            reiziger.setAdres(adres);
-            List<OVChipkaart> ovChipkaarten = ovcdao.findByReiziger(reiziger);
-            reiziger.setOVChipkaarten(ovChipkaarten);
-        } catch (Exception e) {
-            e.printStackTrace();
+            try (PreparedStatement pst = conn.prepareStatement(q)) {
+                pst.setInt(1, reizigerId);
+                ResultSet rs = pst.executeQuery();
+                rs.next();
+                reiziger.setId(rs.getInt("reiziger_id"));
+                reiziger.setVoorletters(rs.getString("voorletters"));
+                reiziger.setTussenvoegsel(rs.getString("tussenvoegsel"));
+                reiziger.setAchternaam(rs.getString("achternaam"));
+                reiziger.setGeboortedatum(rs.getDate("geboortedatum"));
+                rs.close();
+                Adres adres = adao.findByReiziger(reiziger);
+                reiziger.setAdres(adres);
+                List<OVChipkaart> ovChipkaarten = ovcdao.findByReiziger(reiziger);
+                reiziger.setOVChipkaarten(ovChipkaarten);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            return null;
         }
 
         return reiziger;
