@@ -36,7 +36,6 @@ public class OVChipkaartDAOPsql implements OVChipkaartDAO {
         return recordsSaved > 0;
     }
 
-    // Update Update
     @Override
     public boolean update(OVChipkaart ovChipkaart) {
         int recordsUpdated = 0;
