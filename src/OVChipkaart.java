@@ -61,6 +61,44 @@ public class OVChipkaart {
         this.reizigerId = reizigerId;
     }
 
+    public List<Product> getProducten() {
+        return producten;
+    }
+
+    public void setProducten(List<Product> producten) {
+        this.producten = producten;
+    }
+
+    public void addProduct(Product product) {
+        if (!producten.contains(product)) {
+            producten.add(product);
+        }
+    }
+
+    public void removeProduct(Product product) {
+        producten.remove(product);
+    }
+
+
+    public boolean equals(Object andereObject) {
+        boolean gelijkeObjecten = false;
+
+        if (andereObject instanceof OVChipkaart) {
+            OVChipkaart andereOVChipkaart = (OVChipkaart) andereObject;
+
+            if (this.kaartNummer == andereOVChipkaart.getKaartNummer() &&
+                this.geldigTot.equals(andereOVChipkaart.getGeldigTot()) &&
+                this.klasse == andereOVChipkaart.getKlasse() &&
+                this.saldo == andereOVChipkaart.getSaldo() &&
+                this.reizigerId == andereOVChipkaart.getReizigerId() &&
+                this.producten.equals(andereOVChipkaart.getProducten())) {
+                gelijkeObjecten = true;
+            }
+        }
+
+        return gelijkeObjecten;
+    }
+
     public String toString() {
         String s;
         s = String.format("OVChipkaart {#%d, Geldig tot: %s, %d",
