@@ -92,6 +92,27 @@ public class ProductDAOPsql implements ProductDAO {
         return productsDeleted > 0;
     }
 
+    public Product findById(int id) {
+        Product product = new Product();
+
+        String q = "select * from product where product_nummer = ?";
+
+        try (PreparedStatement pst = conn.prepareStatement(q)) {
+            pst.setInt(1, id);
+            ResultSet rs = pst.executeQuery();
+            rs.next();
+            product.setProductNummer(rs.getInt("product_nummer"));
+            product.setNaam(rs.getString("naam"));
+            product.setBeschrijving(rs.getString("beschrijving"));
+            product.setPrijs(rs.getDouble("prijs"));
+            rs.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return product;
+    }
+
     public List<Product> findByOVChipkaart(OVChipkaart ovChipkaart) {
         List<Product> producten = new ArrayList<>();
 
@@ -104,8 +125,6 @@ public class ProductDAOPsql implements ProductDAO {
         try (PreparedStatement pst = conn.prepareStatement(q)) {
             pst.setInt(1, ovChipkaart.getKaartNummer());
             ResultSet rs = pst.executeQuery();
-            rs.next();
-
             while (rs.next()) {
                 Product product = new Product();
                 product.setProductNummer(rs.getInt("product_nummer"));
@@ -129,7 +148,6 @@ public class ProductDAOPsql implements ProductDAO {
 
         try (PreparedStatement pst = conn.prepareStatement(q)) {
             ResultSet rs = pst.executeQuery();
-            rs.next();
             while (rs.next()) {
                 Product product = new Product();
                 product.setProductNummer(rs.getInt("product_nummer"));

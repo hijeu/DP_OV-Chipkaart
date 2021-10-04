@@ -6,14 +6,9 @@ import java.util.List;
 
 public class OVChipkaartDAOPsql implements OVChipkaartDAO {
     private Connection conn;
-    private ReizigerDAO rdao;
 
     public OVChipkaartDAOPsql(Connection conn) {
         this.conn = conn;
-    }
-
-    public void setRdao(ReizigerDAO rdao) {
-        this.rdao = rdao;
     }
 
     @Override
@@ -173,7 +168,6 @@ public class OVChipkaartDAOPsql implements OVChipkaartDAO {
         try (PreparedStatement pst = conn.prepareStatement(q)) {
             pst.setInt(1, product.getProductNummer());
             ResultSet rs = pst.executeQuery();
-            rs.next();
             while (rs.next()) {
                 OVChipkaart ovChipkaart = new OVChipkaart();
                 ovChipkaart.setKaartNummer(rs.getInt("kaart_nummer"));

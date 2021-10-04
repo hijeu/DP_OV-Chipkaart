@@ -4,14 +4,9 @@ import java.util.List;
 
 public class AdresDAOPsql implements AdresDAO {
     private Connection conn;
-    private ReizigerDAO rdao;
 
     public AdresDAOPsql (Connection conn) {
         this.conn = conn;
-    }
-
-    public void setRdao(ReizigerDAO rdao) {
-        this.rdao = rdao;
     }
 
     @Override
