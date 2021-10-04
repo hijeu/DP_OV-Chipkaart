@@ -7,15 +7,15 @@ public class OVChipkaart {
     private Date geldigTot;
     private int klasse;
     private double saldo;
-    private int reizigerId;
+    private Reiziger reiziger;
     private List<Product> producten = new ArrayList<>();
 
-    public OVChipkaart(int kaartNummer, Date geldigTot, int klasse, double saldo, int reizigerId) {
+    public OVChipkaart(int kaartNummer, Date geldigTot, int klasse, double saldo, Reiziger reiziger) {
         this.kaartNummer = kaartNummer;
         this.geldigTot = geldigTot;
         this.klasse = klasse;
         this.saldo = saldo;
-        this.reizigerId = reizigerId;
+        this.reiziger = reiziger;
     }
 
     public OVChipkaart() {
@@ -53,12 +53,12 @@ public class OVChipkaart {
         this.saldo = saldo;
     }
 
-    public int getReizigerId() {
-        return reizigerId;
+    public Reiziger getReiziger() {
+        return reiziger;
     }
 
-    public void setReizigerId(int reizigerId) {
-        this.reizigerId = reizigerId;
+    public void setReiziger(Reiziger reiziger) {
+        this.reiziger = reiziger;
     }
 
     public List<Product> getProducten() {
@@ -90,7 +90,7 @@ public class OVChipkaart {
                 this.geldigTot.equals(andereOVChipkaart.getGeldigTot()) &&
                 this.klasse == andereOVChipkaart.getKlasse() &&
                 this.saldo == andereOVChipkaart.getSaldo() &&
-                this.reizigerId == andereOVChipkaart.getReizigerId() &&
+                this.reiziger.getReizigernummer() == andereOVChipkaart.getReiziger().getReizigernummer() &&
                 this.producten.equals(andereOVChipkaart.getProducten())) {
                 gelijkeObjecten = true;
             }
@@ -108,7 +108,7 @@ public class OVChipkaart {
 
         s += String.format("e klasse, Saldo: €%.2f, Reiziger: #%d",
                 getSaldo(),
-                getReizigerId());
+                getReiziger().getReizigernummer());
         return s;
     }
 }

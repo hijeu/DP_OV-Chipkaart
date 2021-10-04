@@ -21,6 +21,13 @@ public class Main {
             rDAOPsql.setAdao(aDAOPsql);
             rDAOPsql.setOVCdao(ovcDAOPsql);
 
+            aDAOPsql.setRdao(rDAOPsql);
+
+            ovcDAOPsql.setRdao(rDAOPsql);
+            ovcDAOPsql.setPdao(pDAOPsql);
+
+            pDAOPsql.setOVCDao(ovcDAOPsql);
+
             testReizigerDAO(rDAOPsql);
             testAdresDAO(aDAOPsql, rDAOPsql);
             testOVChipkaartDAO(ovcDAOPsql);
@@ -112,7 +119,9 @@ public class Main {
         System.out.println();
 
         // Maak een adres aan en persisteer deze in de database
-        Adres adres = new Adres(6, "3607BL", "556", "Duivenkamp", "Maarssen", 6);
+        Date gbdatum = java.sql.Date.valueOf("1999-03-13");
+        Reiziger hieu = new Reiziger(6, "C.H.M", "van de", "Buurt", gbdatum);
+        Adres adres = new Adres(6, "3607BL", "556", "Duivenkamp", "Maarssen", hieu);
         System.out.print("[Test] Eerst " + adressen.size() + " adressen, na AdresDAO.save() ");
         adao.save(adres);
         adressen = adao.findAll();
@@ -122,7 +131,7 @@ public class Main {
         Reiziger gert = rdao.findById(5);
         Adres adresGert = adao.findByReiziger(gert);
         System.out.print(String.format("[Test] Huisnummer van adres #%d was %s, na AdresDAO.update() is het ",
-                adresGert.getId(),
+                adresGert.getAdresNummer(),
                 adresGert.getHuisnummer()));
         adresGert.setHuisnummer("551");
         adao.update(adresGert);
@@ -136,8 +145,6 @@ public class Main {
         adressen = adao.findAll();
         System.out.println(adressen.size() + " adressen\n");
 
-        String gbdatum = "1999-03-13";
-        Reiziger hieu = new Reiziger(6, "C.H.M", "van de", "Buurt", java.sql.Date.valueOf(gbdatum));
         rdao.delete(hieu);
     }
 
@@ -161,7 +168,9 @@ public class Main {
 
         // Maak een ovchipkaart aan en persisteer deze in de database
         Date geligheidsdatum = java.sql.Date.valueOf("2022-01-01");
-        OVChipkaart ovChipkaart = new OVChipkaart(1, geligheidsdatum, 1, 100.00, 5);
+        Date gbdatum = java.sql.Date.valueOf("2002-12-03");
+        Reiziger gPiccardo = new Reiziger(5, "G", null, "Piccardo", gbdatum);
+        OVChipkaart ovChipkaart = new OVChipkaart(1, geligheidsdatum, 1, 100.00, gPiccardo);
         System.out.print("[Test] Eerst " + ovChipkaarten.size() + " ovchipkaarten, na OVChipkaartDAO.save() ");
         ovcdao.save(ovChipkaart);
         ovChipkaarten = ovcdao.findAll();

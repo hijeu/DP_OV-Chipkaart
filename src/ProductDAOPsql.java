@@ -6,9 +6,14 @@ import java.util.List;
 
 public class ProductDAOPsql implements ProductDAO {
     private Connection conn;
+    private OVChipkaartDAO ovcdao;
 
     public ProductDAOPsql(Connection conn) {
         this.conn = conn;
+    }
+
+    public void setOVCDao (OVChipkaartDAO ovcdao) {
+        this.ovcdao = ovcdao;
     }
 
     @Override
@@ -18,18 +23,23 @@ public class ProductDAOPsql implements ProductDAO {
         String q = "insert into product (product_nummer, naam, beschrijving, prijs) values (?, ?, ?, ?)";
 
         try (PreparedStatement pst = conn.prepareStatement(q)) {
-            pst.setInt(1, product.getProductNummer());
+            pst.setInt(1, product.getProductnummer());
             pst.setString(2, product.getNaam());
             pst.setString(3, product.getBeschrijving());
             pst.setDouble(4, product.getPrijs());
             productsSaved = pst.executeUpdate();
 
-            q = "insert into ov_chipkaart_product (kaart_nummer, product_nummer) values (?, ?)";
             List<OVChipkaart> ovChipkaarten = product.getOvChipkaarten();
+
+            q = "insert into ov_chipkaart_product (kaart_nummer, product_nummer) values (?, ?)";
+
             for (OVChipkaart ovChipkaart : ovChipkaarten) {
+                if (!ovcdao.findAll().contains(ovChipkaart)) {
+                    ovcdao.save(ovChipkaart);
+                }
                 try (PreparedStatement pst2 = conn.prepareStatement(q)) {
                     pst2.setInt(1, ovChipkaart.getKaartNummer());
-                    pst2.setInt(2, product.getProductNummer());
+                    pst2.setInt(2, product.getProductnummer());
                     pst2.executeUpdate();
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -52,8 +62,28 @@ public class ProductDAOPsql implements ProductDAO {
             pst.setString(1, product.getNaam());
             pst.setString(2, product.getBeschrijving());
             pst.setDouble(3, product.getPrijs());
-            pst.setInt(4, product.getProductNummer());
+            pst.setInt(4, product.getProductnummer());
             productsUpdated = pst.executeUpdate();
+
+            q = "delete from ov_chipkaart_product where product_nummer = ?";
+
+            try (PreparedStatement pst2 = conn.prepareStatement(q)) {
+                pst2.setInt(1, product.getProductnummer());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            q = "insert into ov_chipkaart_product (kaart_nummer, product_nummer) " +
+                    "values (?, " + product.getProductnummer() + ")";
+
+            List<OVChipkaart> ovChipkaarten = ovcdao.findByProduct(product);
+            for (OVChipkaart ovChipkaart : ovChipkaarten) {
+                try (PreparedStatement pst2 = conn.prepareStatement(q)) {
+                    pst2.setInt(1, ovChipkaart.getKaartNummer());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -68,7 +98,7 @@ public class ProductDAOPsql implements ProductDAO {
         String q = "delete from ov_chipkaart_product where product_nummer = ?";
 
         try (PreparedStatement pst = conn.prepareStatement(q)) {
-            pst.setInt(1, product.getProductNummer());
+            pst.setInt(1, product.getProductnummer());
             pst.executeUpdate();
 
             q = "delete from product where product_nummer = ? and " +
@@ -77,7 +107,7 @@ public class ProductDAOPsql implements ProductDAO {
                     "prijs = ?";
 
             try (PreparedStatement pst2 = conn.prepareStatement(q)) {
-                pst2.setInt(1, product.getProductNummer());
+                pst2.setInt(1, product.getProductnummer());
                 pst2.setString(2, product.getNaam());
                 pst2.setString(3, product.getBeschrijving());
                 pst2.setDouble(4, product.getPrijs());
@@ -101,10 +131,11 @@ public class ProductDAOPsql implements ProductDAO {
             pst.setInt(1, id);
             ResultSet rs = pst.executeQuery();
             rs.next();
-            product.setProductNummer(rs.getInt("product_nummer"));
+            product.setProductnummer(rs.getInt("product_nummer"));
             product.setNaam(rs.getString("naam"));
             product.setBeschrijving(rs.getString("beschrijving"));
             product.setPrijs(rs.getDouble("prijs"));
+            product.setOvChipkaarten(ovcdao.findByProduct(product));
             rs.close();
         } catch (Exception e) {
             e.printStackTrace();
@@ -127,7 +158,7 @@ public class ProductDAOPsql implements ProductDAO {
             ResultSet rs = pst.executeQuery();
             while (rs.next()) {
                 Product product = new Product();
-                product.setProductNummer(rs.getInt("product_nummer"));
+                product.setProductnummer(rs.getInt("product_nummer"));
                 product.setNaam(rs.getString("naam"));
                 product.setBeschrijving(rs.getString("beschrijving"));
                 product.setPrijs(rs.getDouble("prijs"));
@@ -150,10 +181,11 @@ public class ProductDAOPsql implements ProductDAO {
             ResultSet rs = pst.executeQuery();
             while (rs.next()) {
                 Product product = new Product();
-                product.setProductNummer(rs.getInt("product_nummer"));
+                product.setProductnummer(rs.getInt("product_nummer"));
                 product.setNaam(rs.getString("naam"));
                 product.setBeschrijving(rs.getString("beschrijving"));
                 product.setPrijs(rs.getDouble("prijs"));
+                product.setOvChipkaarten(ovcdao.findByProduct(product));
                 producten.add(product);
             }
             rs.close();

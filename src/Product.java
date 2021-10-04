@@ -2,14 +2,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Product {
-    private int productNummer;
+    private int productnummer;
     private String naam;
     private String beschrijving;
     private double prijs;
     private List<OVChipkaart> ovChipkaarten = new ArrayList<>();
 
     public Product(int productNummer, String naam, String beschrijving, double prijs) {
-        this.productNummer = productNummer;
+        this.productnummer = productNummer;
         this.naam = naam;
         this.beschrijving = beschrijving;
         this.prijs = prijs;
@@ -18,12 +18,12 @@ public class Product {
     public Product() {
     }
 
-    public int getProductNummer() {
-        return productNummer;
+    public int getProductnummer() {
+        return productnummer;
     }
 
-    public void setProductNummer(int productNummer) {
-        this.productNummer = productNummer;
+    public void setProductnummer(int productNummer) {
+        this.productnummer = productNummer;
     }
 
     public String getNaam() {
@@ -74,7 +74,7 @@ public class Product {
         if (andereObject instanceof Product) {
              Product andereProduct = (Product) andereObject;
 
-            if (this.productNummer == andereProduct.getProductNummer() &&
+            if (this.productnummer == andereProduct.getProductnummer() &&
                 this.naam.equals(andereProduct.getNaam()) &&
                 this.beschrijving.equals(andereProduct.getBeschrijving()) &&
                 this.prijs == andereProduct.getPrijs() &&
@@ -88,6 +88,6 @@ public class Product {
 
     public String toString() {
         return String.format("Product {#%d, Naam: %s, Beschrijving: \"%s\", prijs: €%.2f}",
-                getProductNummer(), getNaam(), getBeschrijving(), getPrijs());
+                getProductnummer(), getNaam(), getBeschrijving(), getPrijs());
     }
 }

@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class Reiziger {
-    private int id;
+    private int reizigernummer;
     private String voorletters;
     private String tussenvoegsel;
     private String achternaam;
@@ -12,8 +12,8 @@ public class Reiziger {
     private Adres adres;
     private List<OVChipkaart> OVChipkaarten = new ArrayList<>();
 
-    public Reiziger(int id, String voorletters, String tussenvoegsel, String achternaam, Date geboortedatum) {
-        this.id = id;
+    public Reiziger(int reizigernummer, String voorletters, String tussenvoegsel, String achternaam, Date geboortedatum) {
+        this.reizigernummer = reizigernummer;
         this.voorletters = voorletters;
         this.tussenvoegsel = tussenvoegsel;
         this.achternaam = achternaam;
@@ -23,12 +23,12 @@ public class Reiziger {
     public Reiziger() {
     }
 
-    public int getId() {
-        return id;
+    public int getReizigernummer() {
+        return reizigernummer;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setReizigernummer(int reizigernummer) {
+        this.reizigernummer = reizigernummer;
     }
 
     public String getVoorletters() {
@@ -81,7 +81,7 @@ public class Reiziger {
 
     public String toString() {
         String s = String.format("Reiziger {#%d %s. ",
-                getId(),
+                getReizigernummer(),
                 getVoorletters());
 
         if (!Objects.equals(getTussenvoegsel(), "") && getTussenvoegsel() != null) {

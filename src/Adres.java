@@ -1,29 +1,29 @@
 public class Adres {
-    private int id;
+    private int adresNummer;
     private String postcode;
     private String huisnummer;
     private String straat;
     private String woonplaats;
-    private int reizigerId;
+    private Reiziger reiziger;
 
-    public Adres(int id, String postcode, String huisnummer, String straat, String woonplaats, int reizigerId) {
-        this.id = id;
+    public Adres(int adresNummer, String postcode, String huisnummer, String straat, String woonplaats, Reiziger reiziger) {
+        this.adresNummer = adresNummer;
         this.postcode = postcode;
         this.huisnummer = huisnummer;
         this.straat = straat;
         this.woonplaats = woonplaats;
-        this.reizigerId = reizigerId;
+        this.reiziger = reiziger;
     }
 
     public Adres() {
     }
 
-    public int getId() {
-        return id;
+    public int getAdresNummer() {
+        return adresNummer;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setId(int adresNummer) {
+        this.adresNummer = adresNummer;
     }
 
     public String getPostcode() {
@@ -58,17 +58,17 @@ public class Adres {
         this.woonplaats = woonplaats;
     }
 
-    public int getReizigerId() {
-        return reizigerId;
+    public Reiziger getReiziger() {
+        return reiziger;
     }
 
-    public void setReizigerId(int reizigerId) {
-        this.reizigerId = reizigerId;
+    public void setReiziger(Reiziger reiziger) {
+        this.reiziger = reiziger;
     }
 
     public String toString() {
         return String.format(" Adres {#%d %s %s, %s, %s}",
-                getId(),
+                getAdresNummer(),
                 getStraat(),
                 getHuisnummer(),
                 getPostcode(),
